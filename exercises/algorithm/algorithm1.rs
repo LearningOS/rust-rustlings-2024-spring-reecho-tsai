@@ -2,8 +2,8 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
+use std::cmp::min;
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
 use std::vec::*;
@@ -35,6 +35,7 @@ impl<T> Default for LinkedList<T> {
     }
 }
 
+
 impl<T> LinkedList<T> {
     pub fn new() -> Self {
         Self {
@@ -56,11 +57,11 @@ impl<T> LinkedList<T> {
         self.length += 1;
     }
 
-    pub fn get(&mut self, index: i32) -> Option<&T> {
+    pub fn get(&mut self, index: u32) -> Option<&T> {
         self.get_ith_node(self.start, index)
     }
 
-    fn get_ith_node(&mut self, node: Option<NonNull<Node<T>>>, index: i32) -> Option<&T> {
+    fn get_ith_node(&mut self, node: Option<NonNull<Node<T>>>, index: u32) -> Option<&T> {
         match node {
             None => None,
             Some(next_ptr) => match index {
@@ -69,15 +70,53 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+    
+   
+	}
+
+impl <T: std::cmp::PartialOrd + Copy> LinkedList<T> {
+    pub fn merge(mut list_a:LinkedList<T>,mut list_b:LinkedList<T>) -> Self
 	{
 		//TODO
-		Self {
+		let mut ret = Self {
             length: 0,
             start: None,
             end: None,
+        };
+
+        let mut idx_a = 0;
+        let mut idx_b = 0;
+
+        while idx_a < list_a.length && idx_b < list_b.length {
+            let a = *list_a.get(idx_a).unwrap();
+            let b = *list_b.get(idx_b).unwrap();
+
+            if a < b {
+                ret.add(a);
+                idx_a += 1;
+            } else {
+                ret.add(b);
+                idx_b+=1;
+            }
         }
+
+        while idx_a < list_a.length {
+            let a = *list_a.get(idx_a).unwrap();
+
+            ret.add(a);
+            idx_a += 1;
+        }
+
+        while idx_b < list_b.length {
+            let b = *list_b.get(idx_b).unwrap();
+
+            ret.add(b);
+            idx_b += 1;
+        }
+
+        ret
 	}
+
 }
 
 impl<T> Display for LinkedList<T>
@@ -146,7 +185,7 @@ mod tests {
 		let mut list_c = LinkedList::<i32>::merge(list_a,list_b);
 		println!("merged List is {}", list_c);
 		for i in 0..target_vec.len(){
-			assert_eq!(target_vec[i],*list_c.get(i as i32).unwrap());
+			assert_eq!(target_vec[i],*list_c.get(i as u32).unwrap());
 		}
 	}
 	#[test]
@@ -167,7 +206,7 @@ mod tests {
 		let mut list_c = LinkedList::<i32>::merge(list_a,list_b);
 		println!("merged List is {}", list_c);
 		for i in 0..target_vec.len(){
-			assert_eq!(target_vec[i],*list_c.get(i as i32).unwrap());
+			assert_eq!(target_vec[i],*list_c.get(i as u32).unwrap());
 		}
 	}
 }
