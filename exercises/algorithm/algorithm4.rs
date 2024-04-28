@@ -3,7 +3,6 @@
 	This problem requires you to implement a basic interface for a binary tree
 */
 
-//I AM NOT DONE
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
@@ -39,7 +38,7 @@ where
     }
 }
 
-impl<T> BinarySearchTree<T>
+impl<T: Copy> BinarySearchTree<T>
 where
     T: Ord,
 {
@@ -51,22 +50,93 @@ where
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
         //TODO
+        
+        match &mut self.root {
+            Some(x) =>{ 
+                if value < self.root.as_ref().unwrap().value {
+                    match self.root.as_mut().unwrap().left {
+                        Some(ref mut y) => y.insert(value),
+                        None => self.root.as_mut().unwrap().left = Some(Box::new(TreeNode {
+                                                                            value: value,
+                                                                            left: None,
+                                                                            right: None,
+                                                                        }))
+                    }
+                } else if value > self.root.as_ref().unwrap().value{
+                    match self.root.as_mut().unwrap().right {
+                        Some(ref mut y) => y.insert(value),
+                        None => self.root.as_mut().unwrap().right = Some(Box::new(TreeNode {
+                                                                            value: value,
+                                                                            left: None,
+                                                                            right: None,
+                                                                        }))
+                    }
+                }
+            },
+            None => self.root = Some(Box::new(TreeNode {
+                                        value: value,
+                                        left: None,
+                                        right: None,
+                                    }))
+        }
     }
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
         //TODO
-        true
+        match & self.root {
+            None => false,
+            Some(ref x) => x.search(value),
+        }
     }
 }
 
-impl<T> TreeNode<T>
+impl<T: Copy> TreeNode<T>
 where
     T: Ord,
 {
     // Insert a node into the tree
     fn insert(&mut self, value: T) {
         //TODO
+        if value < self.value {
+            // self.left.unwrap().insert(T); // panic!
+            match &mut self.left {
+                Some(ref mut x) => x.insert(value),
+                None => self.left = Some(Box::new(TreeNode {
+                                                    value : value,
+                                                    left : None,
+                                                    right : None,
+                                                }))
+            }
+        } else {
+            // self.right.unwrap().insert(T);
+            match &mut self.right {
+                Some(x) => x.insert(value),
+                None => self.right = Some(Box::new(TreeNode {
+                                                    value: value,
+                                                    left: None,
+                                                    right: None,
+                                                }))
+            }
+        }
+
+    }
+    fn search (&self, value: T) -> bool {
+        if (self.value == value) {
+            return true;
+        } else {
+            if value < self.value {
+                match &self.left {
+                    None => {return false;},
+                    Some(x) => x.search(value),
+                }
+            } else {
+                match &self.right {
+                    None => {return false;},
+                    Some(x) => x.search(value),
+                }
+            }
+        }
     }
 }
 
