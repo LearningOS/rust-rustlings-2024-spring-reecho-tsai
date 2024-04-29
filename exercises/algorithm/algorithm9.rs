@@ -6,6 +6,7 @@
 
 use std::cmp::Ord;
 use std::default::Default;
+use std::mem::swap;
 
 pub struct Heap<T>
 where
@@ -18,7 +19,7 @@ where
 
 impl<T> Heap<T>
 where
-    T: Default,
+    T: Default + std::cmp::PartialOrd + Copy,
 {
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
@@ -38,6 +39,18 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        self.items.push(value);
+        let mut idx = self.items.len() - 1;
+        
+        while (self.comparator)(&self.items[self.parent_idx(idx)], &self.items[idx]) {
+            // swap(&mut self.items[self.parent_idx(idx)], &mut self.items[idx]);
+            let tmp = self.items[self.parent_idx(idx)];
+            let parent = self.parent_idx(idx);
+            self.items[parent] = value;
+            self.items[idx] = tmp;
+            idx /= 2;
+        } 
+
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -58,13 +71,21 @@ where
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
         //TODO
-		0
+		let left = self.left_child_idx(idx);
+        let right = self.right_child_idx(idx);
+        
+        if self.items[left] > self.items[right] {
+            right
+        } else {
+            left
+        }
+        
     }
 }
 
 impl<T> Heap<T>
 where
-    T: Default + Ord,
+    T: Default + Ord + Copy,
 {
     /// Create a new MinHeap
     pub fn new_min() -> Self {
@@ -95,7 +116,7 @@ impl MinHeap {
     #[allow(clippy::new_ret_no_self)]
     pub fn new<T>() -> Heap<T>
     where
-        T: Default + Ord,
+        T: Default + Ord + Copy,
     {
         Heap::new(|a, b| a < b)
     }
@@ -107,7 +128,7 @@ impl MaxHeap {
     #[allow(clippy::new_ret_no_self)]
     pub fn new<T>() -> Heap<T>
     where
-        T: Default + Ord,
+        T: Default + Ord + Copy,
     {
         Heap::new(|a, b| a > b)
     }
